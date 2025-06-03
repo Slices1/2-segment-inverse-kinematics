@@ -1,0 +1,373 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <time.h>
+
+#include <SDL.h>
+#include "kiss_sdl.h"
+#include <SDL_image.h>
+#include <SDL_ttf.h>
+#include<cmath>
+
+using namespace std;
+
+// Gravity in pixels per second squared
+const float GRAVITY = 750.0f; 
+
+bool init();
+void kill();
+void loop();
+void renderText(string text, SDL_Rect dest);
+
+SDL_Window* window;
+SDL_Renderer* renderer;
+SDL_Texture* box;
+TTF_Font* font;
+int x, y;
+float oToMouseDist;
+float o[2]={640/2,480/2}; //origin                                 SHOULD BE INT...
+float a[2]; //middle point
+float b[2]; //end effector
+float a2[2]; //middle point (mapped)
+float b2[2]; //end effector (mapped)
+const int l = 150; //length of segments
+float alpha;
+float angleFromAtoB;
+float lambda; //angleOfMouseRelativeToO
+float mappingRot;
+float debugValue1;
+float debugValue2;
+float debugValue3;
+
+struct square {
+	float x, y, w, h, xvelocity, yvelocity;
+	Uint32 born, lastUpdate;
+};
+
+void DrawLine1px(int x1, int y1, int x2, int y2) {
+	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+}
+
+int main(int argc, char** args) {
+
+	if ( !init() ) {
+		system("pause");
+		return 1;
+	}
+
+	loop();
+	
+	kill();
+	return 0;
+}
+
+void loop() {
+
+	srand(time(NULL));
+
+	// Physics squares
+	vector<square> squares;
+
+	bool running = true;
+	Uint32 totalFrameTicks = 0;
+	Uint32 totalFrames = 0;
+	while(running) {
+		SDL_Delay(100);
+	
+		// Start frame timing
+		totalFrames++;
+		Uint32 startTicks = SDL_GetTicks();
+		Uint64 startPerf = SDL_GetPerformanceCounter();
+
+		SDL_Event e;
+
+		SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );
+		SDL_RenderClear( renderer );
+
+		// Event loop
+		while ( SDL_PollEvent( &e ) != 0 ) {
+			switch (e.type) { //input detections
+				case SDL_QUIT:
+					running = false;
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					for (int i = 0; i < 100; i++) {
+					square s;
+					s.x = e.button.x;
+					s.y = e.button.y;
+					s.w = rand() % 50 + 25;
+					s.h = rand() % 50 + 25;
+					s.yvelocity = -500;
+					s.xvelocity = rand() % 500 - 250;
+					s.lastUpdate = SDL_GetTicks();
+					s.born = SDL_GetTicks();
+					squares.push_back(s);};
+				case SDL_KEYDOWN:
+					switch(e.key.keysym.sym) {
+						case SDLK_RIGHT: 
+							o[0] += 1; ///////
+							cout << "Right was pressed" << endl;
+							break;
+						case SDLK_LEFT:
+							o[0] += -1;
+							cout << "Left was pressed" << endl;
+							break;
+						case SDLK_UP:
+							o[1] += -1; //////
+							cout << "Up was pressed" << endl;
+							break;
+						case SDLK_DOWN:
+							o[1] += 1;
+							cout << "Down was pressed" << endl;
+							break;
+						
+					}
+			//end of input detections
+			}
+
+
+		}
+
+		// Physics loop
+		for (int index = 0; index < squares.size(); index++) {
+			square& s = squares[index];
+
+			Uint32 time = SDL_GetTicks();
+			float dT = (time - s.lastUpdate) / 1000.0f;
+			
+			s.yvelocity += dT * GRAVITY;
+			s.y += s.yvelocity * dT;
+			s.x += s.xvelocity * dT;
+
+			if (s.y > 480 - s.h) {
+				s.y = 480 - s.h;
+				s.xvelocity = 0;
+				s.yvelocity = 0;
+			}
+
+			s.lastUpdate = time;
+			if (s.lastUpdate > s.born + 5000) {
+				squares.erase(squares.begin() + index);
+				index--;
+			}
+		}
+
+		//Inverse kinematics loop
+		Uint32 buttons = SDL_GetMouseState(&x, &y); //get mouse pos x,y
+
+		oToMouseDist = sqrt(pow(x - o[0], 2) + pow(y - o[1], 2)); //calculate originToMouseDist
+		if(oToMouseDist > 2*l){ oToMouseDist = 2*l;}
+
+		alpha = acos(0.5*oToMouseDist/l); //angleFromOToA
+		a[0]=l*cos(alpha) + o[0];
+		a[1]=l*sin(alpha) + o[1]; //                                                                               MIGHT NEED TO BE NEGATIVE
+		angleFromAtoB = asin(0.5*oToMouseDist/l) + 3*M_PI/2;
+		b[0]=l*cos(angleFromAtoB) + a[0];
+		b[1]=l*sin(angleFromAtoB) + a[1];
+		//mapping to new new coordinate plane relative to mouse`
+
+		if (x-o[0] == 0){
+			if (y>o[1]) {	lambda=M_PI/2;
+			} else if (y<o[1]) {	lambda=3*M_PI/2;
+			} else {cout << ">mouse overlaps origin. cannot calculate rn." << endl;	}
+		} else {
+			mappingRot = atan((y-o[1])/(x-o[0])); //(static_cast<float>(y) - o[1]) / (static_cast<float>(x) - o[0]);
+			if (x-o[0] > 0) {	lambda = mappingRot;
+			} else if (x-o[0] < 0) {	lambda = mappingRot + M_PI;
+			} else {cout << ">this shouldnt ever happen" << endl;	}
+		}
+
+		/*
+		if (x-o[0] == 0){oppOverAdj = 0;}
+		else{oppOverAdj = (y-o[1])/(x-o[0]);}
+		debugValue1 = oppOverAdj;
+
+		if (x > o[0]) { lambda = atan(oppOverAdj);}
+		else if (x < o[0]) { lambda = atan(oppOverAdj) + 3.1415926535;}
+		else{
+			if (y > o[1]){ lambda = 3.1415926535/2;}
+			else{ lambda = 3*3.1415926535/2;}
+		}
+		*/
+
+		
+		debugValue2 = mappingRot;
+		debugValue3 = lambda;
+		a2[0] = (a[0]-o[0])*cos(lambda) - (a[1]-o[1])*sin(lambda) + o[0];
+		a2[1] = (a[0]-o[0])*sin(lambda) + (a[1]-o[1])*cos(lambda) + o[1];
+		b2[0] = (b[0]-o[0])*cos(lambda) - (b[1]-o[1])*sin(lambda) + o[0];
+		b2[1] = (b[0]-o[0])*sin(lambda) + (b[1]-o[1])*cos(lambda) + o[1];
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);  // Set line color to black
+		//DrawLine1px(o[0], o[1], a[0], a[1]); // line 1
+		//DrawLine1px(a[0], a[1], b[0], b[1]); // line 2
+		DrawLine1px(o[0], o[1], a2[0], a2[1]); //mapped line 1
+		DrawLine1px(a2[0], a2[1], b2[0], b2[1]); //mapped line 2
+		//DrawLine1px(o[0], o[1], x, y); //origin to mouse
+		
+		/*
+		cout <<
+		"x:" << x << endl <<
+		"y:" << y << endl <<
+		"alpha:" << alpha << endl <<
+		"angleFromAtoB:" << angleFromAtoB << endl <<
+		"mappingRot:" << mappingRot << endl <<
+		"lambda:" << lambda << endl << endl;
+		*/
+		
+	
+		// Render loop
+		for (const square& s : squares) {
+			SDL_Rect dest = {
+                static_cast<int>(round(s.x)), 
+                static_cast<int>(round(s.y)), 
+                static_cast<int>(round(s.w)), 
+                static_cast<int>(round(s.h))
+            };
+			SDL_RenderCopy(renderer, box, NULL, &dest);
+		}
+
+		// Delay for a random number of ticks - this makes the frame rate variable,
+		// demonstrating that the physics is independent of the frame rate.
+		//SDL_Delay(rand() % 25);
+		SDL_Delay(17);
+
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);  // Set line color to black
+		
+		
+
+		// End frame timing
+		Uint32 endTicks = SDL_GetTicks();
+		Uint64 endPerf = SDL_GetPerformanceCounter();
+		Uint64 framePerf = endPerf - startPerf;
+		float frameTime = (endTicks - startTicks) / 1000.0f;
+		totalFrameTicks += endTicks - startTicks;
+
+		// Strings to display
+		string fps = "Current FPS: " + to_string(1.0f / frameTime);
+		string avg = "Average FPS: " + to_string(1000.0f / ((float)totalFrameTicks / totalFrames));
+		string perf = "Current Perf: " + to_string(framePerf/pow(10,6)) + "ms(?)";
+		string dist = "Current line length: " + to_string(oToMouseDist);
+		string debug1 = "debug1: " + to_string(debugValue1);
+		string debug2 = "debug2: " + to_string(debugValue2);
+		string debug3 = "debug3: " + to_string(debugValue3);
+
+		// Display strings
+		SDL_Rect dest = { 10, 10, 0, 0 };
+		renderText(fps, dest);
+		dest.y += 24;
+		renderText(avg, dest);
+		dest.y += 24;
+		renderText(perf, dest);
+		dest.y += 24;
+		renderText(dist, dest);
+		dest.y += 24;
+		renderText(debug1, dest);
+		dest.y += 24;
+		renderText(debug2, dest);
+		dest.y += 24;
+		renderText(debug3, dest);
+		
+		// Display window
+		SDL_RenderPresent(renderer);
+	}
+}
+
+void renderText(string text, SDL_Rect dest) {
+	SDL_Color fg = { 0, 0, 0 };
+	SDL_Surface* surf = TTF_RenderText_Solid(font, text.c_str(), fg);
+
+	dest.w = surf->w;
+	dest.h = surf->h;
+
+	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
+
+	SDL_RenderCopy(renderer, tex, NULL, &dest);
+	SDL_DestroyTexture(tex);
+	SDL_FreeSurface(surf);
+}
+
+bool init() {
+	if ( SDL_Init( SDL_INIT_EVERYTHING ) < 0 ) {
+		cout << "Error initializing SDL: " << SDL_GetError() << endl;
+		return false;
+	} 
+
+	if ( IMG_Init(IMG_INIT_JPG) < 0 ) {
+		cout << "Error initializing SDL_image: " << IMG_GetError() << endl;
+		return false;
+	}
+
+	if ( TTF_Init() < 0 ) {
+		cout << "Error initializing SDL_ttf: " << TTF_GetError() << endl;
+		return false;
+	}
+
+	window = SDL_CreateWindow( "Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN);
+	if ( !window ) {
+		cout << "Error creating window: " << SDL_GetError()  << endl;
+		return false;
+	}
+
+	renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED );
+	if ( !renderer ) {
+		cout << "Error creating renderer: " << SDL_GetError() << endl;
+		return false;
+	}
+
+	SDL_Surface* buffer = IMG_Load("/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/box.jpg");
+	if ( !buffer ) {
+		cout << "Error loading image box.jpg: " << SDL_GetError() << endl;
+		return false;
+	}
+
+	box = SDL_CreateTextureFromSurface( renderer, buffer );
+	SDL_FreeSurface( buffer );
+	buffer = NULL;
+	if ( !box ) {
+		cout << "Error creating texture: " << SDL_GetError() << endl;
+		return false;
+	}
+
+	font = TTF_OpenFont("/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/font.ttf", 24);
+	if ( !font ) {
+		cout << "Error loading font: " << TTF_GetError() << endl;
+		return false;
+	}
+
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        cout << "SDL initialization failed: %s\n", SDL_GetError() << endl;
+        return false;
+    }
+
+	kiss_array objects;
+	kiss_array_new(&objects);
+
+	return true;
+}
+
+void kill() {
+	TTF_CloseFont( font );
+	SDL_DestroyTexture( box );
+	font = NULL;
+	box = NULL;
+
+	SDL_DestroyRenderer( renderer );
+	SDL_DestroyWindow( window );
+	window = NULL;
+	renderer = NULL;
+
+	TTF_Quit();
+	IMG_Quit();
+	SDL_Quit();
+}
+
+//custom draw functions
+void draw_box( SDL_Rect rect ) {
+	SDL_Rect dst;
+	dst.x = rect.x;
+	dst.y = rect.y;
+	dst.w = rect.w;
+	dst.h = rect.h;
+	SDL_RenderCopy(renderer, box, NULL, &dst );
+}
+

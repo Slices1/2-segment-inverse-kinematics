@@ -1,0 +1,32 @@
+[
+{
+  "directory": "/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/build",
+  "command": "/usr/bin/gcc -I/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/libs/kiss_sdl -isystem /usr/include/SDL2 -g -o CMakeFiles/sdl2-testing-parent-folder.dir/libs/kiss_sdl/kiss_draw.c.o -c /home/slice/code-projects/cpp-projects/nea-ik-from-desmos/libs/kiss_sdl/kiss_draw.c",
+  "file": "/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/libs/kiss_sdl/kiss_draw.c",
+  "output": "CMakeFiles/sdl2-testing-parent-folder.dir/libs/kiss_sdl/kiss_draw.c.o"
+},
+{
+  "directory": "/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/build",
+  "command": "/usr/bin/gcc -I/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/libs/kiss_sdl -isystem /usr/include/SDL2 -g -o CMakeFiles/sdl2-testing-parent-folder.dir/libs/kiss_sdl/kiss_widgets.c.o -c /home/slice/code-projects/cpp-projects/nea-ik-from-desmos/libs/kiss_sdl/kiss_widgets.c",
+  "file": "/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/libs/kiss_sdl/kiss_widgets.c",
+  "output": "CMakeFiles/sdl2-testing-parent-folder.dir/libs/kiss_sdl/kiss_widgets.c.o"
+},
+{
+  "directory": "/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/build",
+  "command": "/usr/bin/gcc -I/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/libs/kiss_sdl -isystem /usr/include/SDL2 -g -o CMakeFiles/sdl2-testing-parent-folder.dir/libs/kiss_sdl/kiss_general.c.o -c /home/slice/code-projects/cpp-projects/nea-ik-from-desmos/libs/kiss_sdl/kiss_general.c",
+  "file": "/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/libs/kiss_sdl/kiss_general.c",
+  "output": "CMakeFiles/sdl2-testing-parent-folder.dir/libs/kiss_sdl/kiss_general.c.o"
+},
+{
+  "directory": "/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/build",
+  "command": "/usr/bin/gcc -I/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/libs/kiss_sdl -isystem /usr/include/SDL2 -g -o CMakeFiles/sdl2-testing-parent-folder.dir/libs/kiss_sdl/kiss_posix.c.o -c /home/slice/code-projects/cpp-projects/nea-ik-from-desmos/libs/kiss_sdl/kiss_posix.c",
+  "file": "/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/libs/kiss_sdl/kiss_posix.c",
+  "output": "CMakeFiles/sdl2-testing-parent-folder.dir/libs/kiss_sdl/kiss_posix.c.o"
+},
+{
+  "directory": "/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/build",
+  "command": "/usr/bin/g++ -I/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/libs/kiss_sdl -isystem /usr/include/SDL2 -g -std=gnu++17 -o CMakeFiles/sdl2-testing-parent-folder.dir/src/main.cpp.o -c /home/slice/code-projects/cpp-projects/nea-ik-from-desmos/src/main.cpp",
+  "file": "/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/src/main.cpp",
+  "output": "CMakeFiles/sdl2-testing-parent-folder.dir/src/main.cpp.o"
+}
+]

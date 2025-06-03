@@ -1,0 +1,11 @@
+# ninja log v5
+2	1010	1727649382800623807	CMakeFiles/sdl2-testing-parent-folder.dir/libs/kiss_sdl/kiss_general.c.o	1e75e394f0d676b
+2	885	1726828526344757564	CMakeFiles/sdl2-testing-parent-folder.dir/main.cpp.o	52c573b53634742a
+2	744	1727651189183639760	CMakeFiles/sdl2-testing-parent-folder.dir/src/main.cpp.o	4f91eadb32a7a953
+744	836	1727651189275638809	sdl2-testing-parent-folder	d74830518d48f7f4
+2	993	1727649382784623964	CMakeFiles/sdl2-testing-parent-folder.dir/libs/kiss_sdl/kiss_posix.c.o	30993450a9325caf
+2	1163	1727649382952622312	CMakeFiles/sdl2-testing-parent-folder.dir/libs/kiss_sdl/kiss_widgets.c.o	b77a4fecd72ae81f
+1	1014	1727649382804623767	CMakeFiles/sdl2-testing-parent-folder.dir/libs/kiss_sdl/kiss_draw.c.o	a4ce1553a42ff6e0
+1	39	1731520794341417051	build.ninja	9a04e6cfd12dad5e
+1	1250	1731520849448872882	CMakeFiles/sdl2-testing-parent-folder.dir/src/main.cpp.o	4f91eadb32a7a953
+1250	1403	1731520849580871580	sdl2-testing-parent-folder	d74830518d48f7f4

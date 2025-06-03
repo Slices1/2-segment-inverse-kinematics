@@ -1,0 +1,3 @@
+/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/build/CMakeFiles/sdl2-testing-parent-folder.dir
+/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/build/CMakeFiles/edit_cache.dir
+/home/slice/code-projects/cpp-projects/nea-ik-from-desmos/build/CMakeFiles/rebuild_cache.dir

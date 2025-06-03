@@ -1,0 +1,21 @@
+To help learn SDL2 and it's line drawing, I am implementing my 2 segment IK arm from desmos.
+I am controlling the origins position with the arrow keys, however it only goes down and left.
+I added debug messages (1.jpg). 
+Pressing up resulted an up and a down message.
+Down resulted in a left, up & down message.
+Left resulted in a left, up & down message.
+Right resulted in a right, left, up & down message.
+Noticing the pattern of number of inputs detected correlating with line number, I added breaks and it fixed it.
+For this small project, I controversially used "O" as the variable name for the origin of the IK arm. Being a small project that I have already completed on desmos, I knew that this would'nt come back to bite me.
+
+
+could be that its dividing by 0 in the arctan thingys
+The floating point exceptions were.
+I also added a delay as to not 100% my cpu so often.
+
+
+Now, I am prototyping the mechanical arm.
+Thoughts: it'll be symmetrical. just requires a base, and grabber.
+The base's arms will be the same length, and parrallel when in either grabbing position
+I have an idea to make single linkages instead and have the motors have higher torque, lower speed.
+update: I simplified the mechanism a lot and will use an electromagnet to grab the box. I can implement proper collision detection & grabbing later.
