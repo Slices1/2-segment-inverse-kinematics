@@ -1,0 +1,1 @@
+A probably no longer functional test of implementing a 2 segment inverse kinematic arm in C++. [Here](https://www.desmos.com/calculator/ry2xeul1ai) is the desmos link at least. it looks a lot better too.
